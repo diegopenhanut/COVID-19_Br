@@ -1,0 +1,42 @@
+Abrangência	Nome	Casos suspeitos	Casos confirmados	% Casos suspeitos	% Casos confirmados	Casos descartados	% Casos descartados	Óbitos	% Óbitos	Total	Transmissão local
+Unidade da Federação	Amapá (AP)	0	0	0	0	0	0	0	0	2	Não
+Unidade da Federação	Roraima (RR)	0	0	0	0	0	0	0	0	2	Não
+Unidade da Federação	Rondônia (RO)	2	0								
+Unidade da Federação	Acre (AC)	3	0								
+Unidade da Federação	Amazonas (AM)	1	0								
+Unidade da Federação	Pará (PA)	1	0								
+Unidade da Federação	Tocantins (TO)	2	0								
+Região	Norte	9	0								
+Unidade da Federação	Maranhão (MA)	6	0								
+Unidade da Federação	Piauí (PI)	1	0								
+Unidade da Federação	Ceará (CE)	22	0								
+Unidade da Federação	Rio Grande do Norte (RN)	12	1								
+Unidade da Federação	Paraíba (PB)	16	0								
+Unidade da Federação	Pernambuco (PE)	18	2								
+Unidade da Federação	Alagoas (AL)	6	1								
+Unidade da Federação	Sergipe (SE)	2	0								
+Unidade da Federação	Bahia (BA)	65	2								
+Região	Nordeste	148	6								
+Unidade da Federação	Minas Gerais (MG)	116	2								
+Unidade da Federação	Espírito Santo (ES)	51	1								
+Unidade da Federação	Rio de Janeiro (RJ)*	76	16								
+Unidade da Federação	São Paulo (SP)**	753	56								
+Região	Sudeste	996	75								
+Unidade da Federação	Paraná (PR)	72	6								
+Unidade da Federação	Santa Catarina (SC)	77	2								
+Unidade da Federação	Rio Grande do Sul (RS)	81	4								
+Região	Sul	230	12								
+Unidade da Federação	Mato Grosso do Sul (MS)	15	0								
+Unidade da Federação	Mato Grosso (MT)	6	0								
+Unidade da Federação	Goiás (GO)	6	3								
+Unidade da Federação	Distrito Federal (DF)	75	2								
+Região	Centro-Oeste	102	5								
+País	Brasil	1485	98								
+											
+Observações											
+*Transmissão comunitária no município do Rio de Janeiro											
+**Transmissão comunitária no município de São Paulo.											
+											
+Fonte											
+Ministério da Saúde											
+Dados atualizados em 14/03/2020 às 16:25											
