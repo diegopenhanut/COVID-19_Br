@@ -115,7 +115,7 @@ simples_estados <- ggplot(estados, aes(x = sigla, y = confirmados)) +
 
 simples_estados
 
-ggsave(filename = "plots/estados_barra.png", simples_brasil, device = "png")
+ggsave(filename = "plots/estados_barra.png", simples_estados, device = "png")
 
 # com animação, brasil
 
