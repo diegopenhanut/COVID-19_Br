@@ -13,7 +13,7 @@ impacto, mostrando as pessoas o quão rápido o número de casos vêm aumentando
 
 ![](plots/brasil_linear.png)
 
-![](animações/estados_barras.gif)
+![](plots/estados_barra.png)
 
 ## Gráficos com animação
 
