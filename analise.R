@@ -21,10 +21,7 @@ library('lubridate')
 library("gganimate")
 library("magick")
 
-# Variáveis que serão usadas depois
 
-#hoje <- format(Sys.time(), "%A, %d de %B de %Y")
-#hoje
 
 # Lendo arquivos com casos
 
@@ -66,35 +63,70 @@ casos <-
   casos %>%
   mutate(dia = ymd(dia))
 
+#mutate(dia = strptime(dia,"%d/%m/%Y"))
+
+str(casos$dia) 
+head(casos$dia) 
+
 casos <- casos %>% mutate(nome = toupper(str_trim(nome)))
 casos <- casos %>% mutate(suspeitos = Casos.suspeitos)
 casos <- casos %>% mutate(confirmados = Casos.confirmados)
 
+# Variáveis que serão usadas depois
 
+hoje <- format(Sys.time(), "%A, %d de %B de %Y")
+hoje
+
+ultimo_dia <- max(casos$dia)
+ultimo_dia
 # gráfico de linha
 
 brasil <- casos %>%
   group_by(dia) %>%
   summarise(confirmados = sum(confirmados))
 
-brasil
+# gráfico de barras, com último dia
+estados <- casos %>%
+	filter(dia == ultimo_dia) %>%
+	group_by(sigla) %>%
+	summarise(confirmados = sum(confirmados))
+
 
 # sem animação, brasil
 simples_brasil <- ggplot(brasil, aes(x = dia, y = confirmados)) +
   geom_line() +
-  theme_minimal() 
+  theme_minimal() +
+  xlab("Dia") + 
+  ylab("Confirmados") 
+
+simples_brasil
 
 ggsave(filename = "plots/brasil_linear.png", simples_brasil, device = "png")
+
+# sem animação, estados
+
+simples_estados <- ggplot(estados, aes(x = sigla, y = confirmados)) +
+  geom_col() +
+  ggtitle(paste0("Casos confirmados por estado em ", ultimo_dia, " COVID-19")) + 
+  xlab("Estados") + 
+  ylab("Confirmados") + 
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90))
+
+simples_estados
+
+ggsave(filename = "plots/estados_barra.png", simples_brasil, device = "png")
 
 # com animação, brasil
 
 ani_brasil <- ggplot(brasil, aes(x = dia, y = confirmados)) +
   geom_line() +
   geom_point(size = 2) + 
-  #coord_cartesian(clip = 'off') + 
   transition_reveal(dia) +
   labs(title = 'Casos confirmados no Brasil - COVID-19') +
-  theme_minimal()  
+  theme_minimal() +
+  xlab("Estados") + 
+  ylab("Confirmados") 
 
 ani_brasil
 
@@ -117,21 +149,6 @@ br <- get_brmap(geo = "State",
           geo.filter = NULL,
           class = "sf")
 
-#ggplot(br) + 
-#  geom_sf(color = "black", fill = "lightgreen")
-
-
-# mcs <- plot_brmap(br, data_to_join = casos, 
-#            join_by = c("nome" = "nome"),
-#            var = "suspeitos") +
-#   labs(title = "Brasil - COVID-19",
-#        subtitle = paste0(
-#          sum(casos$suspeitos),
-#          ' casos suspeitos em ', 
-#          hoje
-#        )) +
-#   scale_fill_viridis_c(na.value = 0)
-
 anim_mapa <- 
   plot_brmap(br, data_to_join = casos, 
            join_by = c("nome" = "nome"),
@@ -145,7 +162,7 @@ anim_mapa <-
 ylab("") +
 xlab("") +
     transition_time(dia) +
-    scale_fill_viridis_c(na.value = 0, trans = 'log') +
+    scale_fill_viridis_c(na.value = 0, trans = 'log10', guide = "legend") +
     theme_minimal()
     
 anim_mapa
