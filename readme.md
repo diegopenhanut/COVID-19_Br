@@ -9,11 +9,15 @@ isso podem ser encontrados na pasta `dados/`
 Uma parte dos gráficos foi feita com animações, de modo que possa ter maior
 impacto, mostrando as pessoas o quão rápido o número de casos vêm aumentando.
 
-## Gráficos estáticos
+## Gráficos sem animação
 
 ![](plots/brasil_linear.png)
 
 ![](plots/estados_barra.png)
+
+## Predição do número de casos para a próxima semana
+
+![](plots/brasil_predicao.png)
 
 ## Gráficos com animação
 

@@ -84,10 +84,11 @@ write_csv2(casos, 'casos_compilados.csv')
 # Variáveis que serão usadas depois
 
 hoje <- format(Sys.time(), "%A, %d de %B de %Y")
-hoje
 
 ultimo_dia <- max(casos$dia)
-ultimo_dia
+
+primeiro_dia <- min(casos$dia)
+
 
 # gráfico de linha
 
@@ -117,10 +118,15 @@ ggsave(filename = "plots/brasil_linear.png", simples_brasil, device = "png")
 
 # tentando extrapolar usando log para uma semana de casos
 
-ggplot(brasil, aes(x = dia, y = casos, color = tipo)) +
+filter(brasil, tipo == "confirmados") %>%
+  
+ggplot(aes(x = dia, y = casos, color = tipo)) +
+  scale_y_continuous(trans='log10') + 
   geom_point() +
-  xlim(ultimo_dia + 7) +
-  stat_smooth(method="lm",fullrange=TRUE)
+  xlim(primeiro_dia, ultimo_dia + 7) +
+  stat_smooth(method="lm", 
+              #formula = 'x ~ y',
+              fullrange=TRUE)
 
 
 # gráfico de barras, com último dia
