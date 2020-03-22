@@ -20,7 +20,6 @@ library("tidyverse")
 library('lubridate')
 library("gganimate")
 library("magick")
-library("av")
 
 
 
@@ -115,6 +114,15 @@ simples_brasil
 
 ggsave(filename = "plots/brasil_linear.png", simples_brasil, device = "png")
 
+
+# tentando extrapolar usando log para uma semana de casos
+
+ggplot(brasil, aes(x = dia, y = casos, color = tipo)) +
+  geom_point() +
+  xlim(ultimo_dia + 7) +
+  stat_smooth(method="lm",fullrange=TRUE)
+
+
 # gráfico de barras, com último dia
 
 estados <- casos %>%
@@ -153,8 +161,6 @@ ani_brasil
 
 anim_save(filename = "animações/brasil_linear.gif")
 
-vid_temp <- animate(ani_brasil, renderer = av_renderer()) 
-anim_save("animações/brasil_linear.mp4", vid_temp)
 
 estados_anim <- casos %>%
   select(sigla, confirmados = Casos.confirmados, óbitos = Óbitos, dia) %>%
@@ -173,9 +179,6 @@ anim_estado_bar <- ggplot(estados_anim, aes(x = sigla, y = casos, fill = tipo)) 
 anim_estado_bar
 
 anim_save(filename = "animações/estados_barras.gif")
-
-vid_estado_bar <- animate(anim_estado_bar, renderer = av_renderer()) 
-anim_save("animações/estados_barras.mp4", vid_estado_bar)
 
 # preparando mapa
 
@@ -203,8 +206,18 @@ anim_mapa
 
 anim_save(filename = "animações/brasil_mapa.gif")
 
-vid_map <- animate(anim_mapa, renderer = av_renderer()) 
-anim_save("animações/brasil_mapa.mp4", vid_map)
+# Caso queira vídeo
+
+# library("av")
+
+# vid_temp <- animate(ani_brasil, renderer = av_renderer()) 
+# anim_save("animações/brasil_linear.mp4", vid_temp)
+
+# vid_estado_bar <- animate(anim_estado_bar, renderer = av_renderer()) 
+# anim_save("animações/estados_barras.mp4", vid_estado_bar)
+
+# vid_map <- animate(anim_mapa, renderer = av_renderer()) 
+# anim_save("animações/brasil_mapa.mp4", vid_map)
 
 
 
