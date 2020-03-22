@@ -40,8 +40,8 @@ for (i in 1:length(file_list)) {
   print(file_list[i])
   files[[i]] <- read.delim2(file_list[i], fileEncoding = "UTF-8") %>%
 	rename(Abrangência = 1, Nome = 2) %>%
-  select("Abrangência", "Nome", "Casos.confirmados") %>%
-    mutate(dia = file_list[i]) 
+  select("Abrangência", "Nome", "Casos.confirmados", "Óbitos") %>%
+    mutate(dia = file_list[i], Óbitos = as.numeric(Óbitos)) 
 
   print("Leitura terminada")
   }
@@ -65,7 +65,12 @@ casos <-
   casos %>%
   mutate(dia = ymd(dia))
 
-#mutate(dia = strptime(dia,"%d/%m/%Y"))
+casos <-
+  casos %>%
+  mutate(Óbitos = if_else(Óbitos == 0, as.numeric(NA), Óbitos))
+
+
+summary(casos$Óbitos)
 
 str(casos$dia) 
 head(casos$dia) 
@@ -82,21 +87,23 @@ hoje
 
 ultimo_dia <- max(casos$dia)
 ultimo_dia
+
 # gráfico de linha
 
 brasil <- casos %>%
   group_by(dia) %>%
-  summarise(confirmados = sum(confirmados))
+  summarise(confirmados = sum(confirmados, na.rm = TRUE),
+            óbitos = sum(Óbitos, na.rm = TRUE)) %>%
+  gather(key = tipo, value = casos, -dia) %>%
+  mutate(tipo = factor(x = tipo, levels = c("óbitos", "confirmados")))
 
-# gráfico de barras, com último dia
-estados <- casos %>%
-	filter(dia == ultimo_dia) %>%
-	group_by(sigla) %>%
-	summarise(confirmados = sum(confirmados))
+brasil <- mutate(brasil, casos = if_else(casos == 0, as.numeric(NA), casos)) 
 
+filter(brasil, tipo == 'óbitos')
 
 # sem animação, brasil
-simples_brasil <- ggplot(brasil, aes(x = dia, y = confirmados)) +
+
+simples_brasil <- ggplot(brasil, aes(x = dia, y = casos, color = tipo)) +
   geom_line() +
   theme_minimal() +
   xlab("Dia") + 
@@ -106,15 +113,23 @@ simples_brasil
 
 ggsave(filename = "plots/brasil_linear.png", simples_brasil, device = "png")
 
+# gráfico de barras, com último dia
+
+estados <- casos %>%
+	filter(dia == ultimo_dia) %>%
+  select(sigla, confirmados = Casos.confirmados, óbitos = Óbitos) %>%
+  gather(key = 'tipo', value = 'casos', -sigla) %>%
+  mutate(tipo = factor(x = tipo, levels = c("óbitos", "confirmados")))
+
+
 # sem animação, estados
 
-simples_estados <- ggplot(estados, aes(x = sigla, y = confirmados)) +
-  geom_col() +
+simples_estados <- ggplot(estados, aes(x = sigla, y = casos, fill = tipo)) +
+  geom_col(position = 'dodge') +
   ggtitle(paste0("Casos confirmados por estado em ", ultimo_dia, " COVID-19")) + 
   xlab("Estados") + 
   ylab("Confirmados") + 
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 90))
+  theme_minimal() 
 
 simples_estados
 
@@ -122,7 +137,7 @@ ggsave(filename = "plots/estados_barra.png", simples_estados, device = "png")
 
 # com animação, brasil
 
-ani_brasil <- ggplot(brasil, aes(x = dia, y = confirmados)) +
+ani_brasil <- ggplot(brasil, aes(x = dia, y = casos, color = tipo)) +
   geom_line() +
   geom_point(size = 2) + 
   transition_reveal(dia) +
