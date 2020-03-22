@@ -38,16 +38,18 @@ for (i in 1:length(file_list)) {
   print("lendo...")
   print(i)
   print(file_list[i])
-  files[[i]] <- read.delim2(file_list[i]) %>%
-#	rename(Abrangência = 1, Nome = 2) %>%
-  select("Abrangência", "Nome", "Casos.suspeitos", "Casos.confirmados") %>%
-    filter(Abrangência == 'Unidade da Federação') %>%
+  files[[i]] <- read.delim2(file_list[i], fileEncoding = "UTF-8") %>%
+	rename(Abrangência = 1, Nome = 2) %>%
+  select("Abrangência", "Nome", "Casos.confirmados") %>%
     mutate(dia = file_list[i]) 
 
   print("Leitura terminada")
   }
 
 casos <- bind_rows(files)
+
+casos <- filter(casos, Abrangência == 'Unidade da Federação')
+
 
 casos <- casos %>% 
   separate(col = Nome,
@@ -69,8 +71,9 @@ str(casos$dia)
 head(casos$dia) 
 
 casos <- casos %>% mutate(nome = toupper(str_trim(nome)))
-casos <- casos %>% mutate(suspeitos = Casos.suspeitos)
 casos <- casos %>% mutate(confirmados = Casos.confirmados)
+
+write_csv2(casos, 'casos_compilados.csv')
 
 # Variáveis que serão usadas depois
 
@@ -125,7 +128,7 @@ ani_brasil <- ggplot(brasil, aes(x = dia, y = confirmados)) +
   transition_reveal(dia) +
   labs(title = 'Casos confirmados no Brasil - COVID-19') +
   theme_minimal() +
-  xlab("Estados") + 
+  xlab("Dia") + 
   ylab("Confirmados") 
 
 ani_brasil
@@ -151,40 +154,23 @@ br <- get_brmap(geo = "State",
 
 anim_mapa <- 
   plot_brmap(br, data_to_join = casos, 
-           join_by = c("nome" = "nome"),
-           var = "confirmados") + 
+             join_by = c("nome" = "nome"),
+             var = "confirmados") + 
   coord_sf(datum = NA) +
   labs(title = "Brasil - COVID-19", 
        subtitle = paste0(
          ' casos confirmados em ',
          "{frame_time}"
        )) +
-ylab("") +
-xlab("") +
-    transition_time(dia) +
-    scale_fill_viridis_c(na.value = 0, trans = 'log10', guide = "legend") +
-    theme_minimal()
-    
+  ylab("") +
+  xlab("") +
+  transition_time(dia) +
+  scale_fill_viridis_c(na.value = 0, trans = 'log10', guide = "legend") +
+  theme_minimal()
+
 anim_mapa
 
 anim_save(filename = "animações/brasil_mapa.gif")
 
-# combinando múltiplos mapas
 
-# a_gif <- animate(ani_brasil)
-# b_gif <- animate(anim_estado_bar)
-# c_gif <- animate(anim_mapa)
-# 
-# 
-# a_mgif <- image_read(a_gif)
-# b_mgif <- image_read(b_gif)
-# c_mgif <- image_read(c_gif)
-# 
-# new_gif <- image_append(c(a_mgif[1], b_mgif[1], c_mgif[1]))
-# for(i in 2:100){
-#   combined <- image_append(c(a_mgif[i], b_mgif[i], c_mgif))
-#   new_gif <- c(new_gif, combined)
-# }
-# 
-# new_gif
-# 
+

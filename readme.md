@@ -29,18 +29,6 @@ impacto, mostrando as pessoas o quão rápido o número de casos vêm aumentando
 ### Número de casos por estado e tempo, escala de cor
 ![](animações/brasil_mapa.gif)
 
-
-### Combinação dos gráficos anteriores
-
-Linha e Barras
-
-![](animações/anim1+2.gif)
-
-
-Todos
-
-![](animações/anim_final.gif)
-
 ## Observações
 - Vou tentar manter atualizado, tão logo o Ministério da Saúde continue
   liberando as tabelas com número de casos
