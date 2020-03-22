@@ -20,6 +20,8 @@ library("tidyverse")
 library('lubridate')
 library("gganimate")
 library("magick")
+library("av")
+
 
 
 
@@ -129,7 +131,8 @@ simples_estados <- ggplot(estados, aes(x = sigla, y = casos, fill = tipo)) +
   ggtitle(paste0("Casos confirmados por estado em ", ultimo_dia, " COVID-19")) + 
   xlab("Estados") + 
   ylab("Confirmados") + 
-  theme_minimal() 
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 
 simples_estados
 
@@ -150,16 +153,29 @@ ani_brasil
 
 anim_save(filename = "animações/brasil_linear.gif")
 
-anim_estado_bar <- ggplot(casos, aes(x = sigla, y = confirmados)) +
-  geom_col() +
+vid_temp <- animate(ani_brasil, renderer = av_renderer()) 
+anim_save("animações/brasil_linear.mp4", vid_temp)
+
+estados_anim <- casos %>%
+  select(sigla, confirmados = Casos.confirmados, óbitos = Óbitos, dia) %>%
+  gather(key = 'tipo', value = 'casos', -sigla, -dia) %>%
+  mutate(tipo = factor(x = tipo, levels = c("óbitos", "confirmados")))
+
+
+anim_estado_bar <- ggplot(estados_anim, aes(x = sigla, y = casos, fill = tipo)) +
+  geom_col(position = 'dodge') +
   transition_time(dia) +
   labs(title = 'Casos confirmados no Brasil - COVID-19',
      subtitle = 'dia {frame_time}') +
-  theme_minimal()  
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 
 anim_estado_bar
 
 anim_save(filename = "animações/estados_barras.gif")
+
+vid_estado_bar <- animate(anim_estado_bar, renderer = av_renderer()) 
+anim_save("animações/estados_barras.mp4", vid_estado_bar)
 
 # preparando mapa
 
@@ -186,6 +202,9 @@ anim_mapa <-
 anim_mapa
 
 anim_save(filename = "animações/brasil_mapa.gif")
+
+vid_map <- animate(anim_mapa, renderer = av_renderer()) 
+anim_save("animações/brasil_mapa.mp4", vid_map)
 
 
 
