@@ -118,16 +118,20 @@ ggsave(filename = "plots/brasil_linear.png", simples_brasil, device = "png")
 
 # tentando extrapolar usando log para uma semana de casos
 
-filter(brasil, tipo == "confirmados") %>%
-  
-ggplot(aes(x = dia, y = casos, color = tipo)) +
+predicao_brasil <- filter(brasil, tipo == "confirmados") %>%
+  ggplot(aes(x = dia, y = casos, color = tipo)) +
   scale_y_continuous(trans='log10') + 
   geom_point() +
   xlim(primeiro_dia, ultimo_dia + 7) +
   stat_smooth(method="lm", 
               #formula = 'x ~ y',
-              fullrange=TRUE)
+              fullrange=TRUE) + 
+  labs(title = 'Predição do número casos para os próximos 7 dias - COVID-19',
+       subtitle = paste0('último dia: ', ultimo_dia, ', predição até: ', ultimo_dia + 7) ) +
+  theme_minimal()
+  
 
+ggsave(filename = "plots/brasil_predicao.png", predicao_brasil, device = "png")
 
 # gráfico de barras, com último dia
 
