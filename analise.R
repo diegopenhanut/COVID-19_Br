@@ -101,7 +101,7 @@ brasil <- casos %>%
 
 brasil <- mutate(brasil, casos = if_else(casos == 0, as.numeric(NA), casos)) 
 
-filter(brasil, tipo == 'óbitos')
+# filter(brasil, tipo == 'óbitos')
 
 # sem animação, brasil
 
@@ -130,6 +130,7 @@ predicao_brasil <- filter(brasil, tipo == "confirmados") %>%
        subtitle = paste0('último dia: ', ultimo_dia, ', predição até: ', ultimo_dia + 7) ) +
   theme_minimal()
   
+predicao_brasil
 
 ggsave(filename = "plots/brasil_predicao.png", predicao_brasil, device = "png")
 
