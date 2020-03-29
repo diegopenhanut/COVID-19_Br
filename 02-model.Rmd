@@ -108,6 +108,7 @@ ggplot(bra_pred, aes(x = dia, y = confirmados)) +
 
 ```{r}
 library('incidence')
+library('lubridate')
 
 incid <- vector()
 datas <- vector()
@@ -123,6 +124,8 @@ for(i in 2:nrow(bra)){
 for(i in 1:nrow(bra)){
  datas <- c(datas, rep(bra$dia[i], incid[i]))
 }
+
+datas <- as_date(datas)
 
 bra <- mutate(bra, incidencia = incid)
 bra_pred <- left_join(bra_pred, bra)
@@ -148,7 +151,8 @@ ggsave('plots/incidência_linha.png', device = 'png')
 Criação do objeto do tipo incidência e cálculo de Infectividade Lambda
 
 ```{r}
-incid_p <- incidence(dates = datas)
+hj <- as.Date("2020-03-30")
+incid_p <- incidence(dates = datas, last_date = hj)
 
 # os valores de média e desvio padrão são dados no post, 
 # são derivados 
@@ -171,6 +175,14 @@ ggsave('plots/incidência_lambda.png', device = 'png')
 
 ```
 
+R
+
+```{r}
+# pacote earlyR
+res <- earlyR::get_R(incid_p, si_mean = 5, si_sd = 3.4)
+res
+plot(res)
+```
 
 
 
