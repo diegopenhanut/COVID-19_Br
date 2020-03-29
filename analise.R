@@ -1,14 +1,12 @@
 #!/usr/bin/env Rscript
 
 # requisitos
+#
 # libudunits2
-#➜  ~ sudo apt install libudunits2-dev
+# sudo apt install libudunits2-dev
+#
 # gdal
-#!/usr/bin/env Rscript
-
-
-#➜  ~ sudo apt install libgdal-dev
-#  libmagick++-dev 
+# sudo apt install libgdal-dev libmagick++-dev 
 # install.packages("brazilmaps")
 # install.packages(transformr)
  
