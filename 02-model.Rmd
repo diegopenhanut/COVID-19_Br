@@ -30,6 +30,7 @@ https://rviews.rstudio.com/2020/03/05/covid-19-epidemiology-with-r/
 library("tidyverse")
 library("earlyR")
 library("EpiEstim")
+theme_set(theme_minimal())
 
 casos <- read_csv2("output/casos_compilados.csv")
 
@@ -57,18 +58,17 @@ primeiro_dia <- min(casos$dia)
 # modelando
 me <- with(bra, lm(log(confirmados) ~ dia))
 summary(me)
+
 periodo_pred <- seq(primeiro_dia, ultimo_dia + 7, 1)
 predicao <- exp(predict(me,list(dia=periodo_pred)))
 pre <- tibble(dia = periodo_pred, pred = predicao)
-tail(pre)
 
 bra_pred <- left_join(pre, bra, by = "dia")
 
-bra
 
 # gráfico em barras
 ggplot(bra_pred, aes(x = dia, y = confirmados)) +
-	geom_col()
+	geom_col() 
 
 # mostrando curva exponencial 
 filter(bra_pred)  %>% na.omit %>%
@@ -83,10 +83,28 @@ ggplot(aes(x = dia, y = confirmados)) +
 	geom_col() +
 	geom_line(aes(y = pred))
 
+ggplot(bra_pred, aes(x = dia, y = confirmados)) +
+  geom_point() +
+  geom_line(aes(y = pred)) + 
+  labs(title = 'Predição do número casos para os próximos 7 dias - COVID-19',
+       subtitle = paste0('último dia: ', ultimo_dia, ', predição até: ', ultimo_dia + 7) ) 
+
+ggplot(bra_pred, aes(x = dia, y = confirmados)) +
+  scale_y_continuous(trans='log10') + 
+  geom_point() +
+  geom_line(aes(y = pred)) + 
+  labs(title = 'Predição do número casos para os próximos 7 dias - COVID-19',
+       subtitle = paste0('último dia: ', ultimo_dia, ', predição até: ', ultimo_dia + 7) ) 
+  
 
 ```
 
-# Usando pacotes específicos
+# Usando pacotes específicos para Epidemiologia
+
+
+## Estimando incidência
+- Para calcular a incidência subtraí o total de casos de um dia pelo o do dia anterior
+- Aqui também criei um vetor com as datas de registro de cada caso
 
 ```{r}
 library('incidence')
@@ -102,40 +120,58 @@ for(i in 2:nrow(bra)){
  incid <- c(incid, j)
 }
 
-bra <- mutate(bra, incidencia = incid)
-
-ggplot(bra, aes(dia, incidencia)) + 
-	geom_col()
-
-ggplot(bra, aes(dia, incidencia)) + 
-	geom_line()
-
 for(i in 1:nrow(bra)){
  datas <- c(datas, rep(bra$dia[i], incid[i]))
 }
 
-incid_p <- incidence(dates = datas)
+bra <- mutate(bra, incidencia = incid)
+bra_pred <- left_join(bra_pred, bra)
+
 ```
 
+Alguns gráficos de incidência
 
-# Tentativa anterior
 
 ```{r}
-predicao_brasil <- filter(brasil, tipo == "confirmados") %>%
-  ggplot(aes(x = dia, y = casos, color = tipo)) +
-  scale_y_continuous(trans='log10') + 
-  geom_point() +
-  xlim(primeiro_dia, ultimo_dia + 7) +
-  stat_smooth(method="lm", 
-              #formula = 'x ~ log(y)',
-              fullrange=TRUE) + 
-  labs(title = 'Predição do número casos para os próximos 7 dias - COVID-19',
-       subtitle = paste0('último dia: ', ultimo_dia, ', predição até: ', ultimo_dia + 7) ) +
-  theme_minimal()
-  
-predicao_brasil
+
+ggplot(bra, aes(dia, incidencia)) + 
+	geom_col() 
+
+ggsave('plots/incidência_barra.png', device = 'png')
+
+ggplot(bra, aes(dia, incidencia)) + 
+	geom_line() 
+
+ggsave('plots/incidência_linha.png', device = 'png')
+```
+
+Criação do objeto do tipo incidência e cálculo de Infectividade Lambda
+
+```{r}
+incid_p <- incidence(dates = datas)
+
+# os valores de média e desvio padrão são dados no post, 
+# são derivados 
+# o seq(0, 20) foi retirado do manual do pacote 
+
+discrete_si_distr <- discr_si(seq(0, 20), 5, 3.4)
+
+lambda <- overall_infectivity(incid_p, discrete_si_distr)
+
+bra_pred <- bra_pred %>% filter(dia <= ultimo_dia)
+
+bra_pred <- mutate(bra_pred, lambda = lambda) 
+
+ggplot(bra_pred, aes(dia, incidencia)) +
+	geom_col(fill = "steelblue") +
+	geom_line(aes(y = lambda),  size = 2, color = 'red') +
+	labs(title = "Incidência e Força de Infecção (Lambda) para COVID-19, Brasil")
+
+ggsave('plots/incidência_lambda.png', device = 'png')
 
 ```
+
+
 
 
 
