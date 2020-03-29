@@ -1,0 +1,141 @@
+---
+title: "COVID-19 - Curva Epidemiológica"
+author: "Emanuel Diego S Penha"
+output:
+  pdf_document:
+    latex_engine: xelatex
+    number_sections: yes
+    toc: yes
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
+header-includes:
+- \usepackage[brazil]{babel}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      fig.width = 10,
+                      echo = FALSE)
+
+options(scipen = 10, digits = 6)
+```
+
+# Informações
+
+- Tentativa de implementar algo como visto em 
+https://rviews.rstudio.com/2020/03/05/covid-19-epidemiology-with-r/
+
+# Carregar pacotes
+
+```{r}
+library("tidyverse")
+library("earlyR")
+library("EpiEstim")
+
+casos <- read_csv2("output/casos_compilados.csv")
+
+bra <- casos %>%
+  group_by(dia) %>%
+  summarise(confirmados = sum(confirmados, na.rm = TRUE),
+            óbitos = sum(obitos, na.rm = TRUE)) 
+
+# bra <- mutate(bra, casos = if_else(casos == 0, as.numeric(NA), casos)) 
+```
+
+# Variáveis que serão usadas depois
+```{r}
+hoje <- format(Sys.time(), "%A, %d de %B de %Y")
+
+ultimo_dia <- max(casos$dia)
+
+primeiro_dia <- min(casos$dia)
+
+```
+
+# Modelo exponencial simples
+
+```{r}
+# modelando
+me <- with(bra, lm(log(confirmados) ~ dia))
+summary(me)
+periodo_pred <- seq(primeiro_dia, ultimo_dia + 7, 1)
+predicao <- exp(predict(me,list(dia=periodo_pred)))
+pre <- tibble(dia = periodo_pred, pred = predicao)
+tail(pre)
+
+bra_pred <- left_join(pre, bra, by = "dia")
+
+bra
+
+# gráfico em barras
+ggplot(bra_pred, aes(x = dia, y = confirmados)) +
+	geom_col()
+
+# mostrando curva exponencial 
+filter(bra_pred)  %>% na.omit %>%
+ggplot(aes(x = dia, y = confirmados)) +
+	geom_col() +
+	xlim(primeiro_dia, ultimo_dia) +
+	geom_line(aes(y = pred))
+
+# mostrando curva exponencial e predição
+bra_pred %>%
+ggplot(aes(x = dia, y = confirmados)) +
+	geom_col() +
+	geom_line(aes(y = pred))
+
+
+```
+
+# Usando pacotes específicos
+
+```{r}
+library('incidence')
+
+incid <- vector()
+datas <- vector()
+
+incid <- 1
+
+for(i in 2:nrow(bra)){
+	print(i)
+	j <- bra$confirmados[i] - bra$confirmados[i-1]
+ incid <- c(incid, j)
+}
+
+bra <- mutate(bra, incidencia = incid)
+
+ggplot(bra, aes(dia, incidencia)) + 
+	geom_col()
+
+ggplot(bra, aes(dia, incidencia)) + 
+	geom_line()
+
+for(i in 1:nrow(bra)){
+ datas <- c(datas, rep(bra$dia[i], incid[i]))
+}
+
+incid_p <- incidence(dates = datas)
+```
+
+
+# Tentativa anterior
+
+```{r}
+predicao_brasil <- filter(brasil, tipo == "confirmados") %>%
+  ggplot(aes(x = dia, y = casos, color = tipo)) +
+  scale_y_continuous(trans='log10') + 
+  geom_point() +
+  xlim(primeiro_dia, ultimo_dia + 7) +
+  stat_smooth(method="lm", 
+              #formula = 'x ~ log(y)',
+              fullrange=TRUE) + 
+  labs(title = 'Predição do número casos para os próximos 7 dias - COVID-19',
+       subtitle = paste0('último dia: ', ultimo_dia, ', predição até: ', ultimo_dia + 7) ) +
+  theme_minimal()
+  
+predicao_brasil
+
+```
+
+
+

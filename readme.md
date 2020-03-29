@@ -9,15 +9,21 @@ isso podem ser encontrados na pasta `dados/`
 Uma parte dos gráficos foi feita com animações, de modo que possa ter maior
 impacto, mostrando as pessoas o quão rápido o número de casos vêm aumentando.
 
+## Requisitos (Ubuntu 18.04)
+- Para compilar pacotes
+`sudo apt install r-base-dev`
+- libudunits2
+`sudo apt install libudunits2-dev`
+- gdal
+`sudo apt install libgdal-dev libmagick++-dev` 
+- libsodium
+`sudo apt install libsodium-dev`
 ## Gráficos sem animação
 
 ![](plots/brasil_linear.png)
 
 ![](plots/estados_barra.png)
 
-## Predição do número de casos para a próxima semana
-
-![](plots/brasil_predicao.png)
 
 ## Gráficos com animação
 
