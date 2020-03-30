@@ -109,9 +109,9 @@ anim_save(filename = "animações/brasil_linear.gif")
 
 
 estados_anim <- casos %>%
-  select(sigla, confirmados = Casos.confirmados, óbitos = Óbitos, dia) %>%
+  select(sigla, confirmados, obitos, dia) %>%
   gather(key = 'tipo', value = 'casos', -sigla, -dia) %>%
-  mutate(tipo = factor(x = tipo, levels = c("óbitos", "confirmados")))
+  mutate(tipo = factor(x = tipo, levels = c("obitos", "confirmados")))
 
 
 anim_estado_bar <- ggplot(estados_anim, aes(x = sigla, y = casos, fill = tipo)) +

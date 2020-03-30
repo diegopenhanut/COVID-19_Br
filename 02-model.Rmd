@@ -152,7 +152,8 @@ Criação do objeto do tipo incidência e cálculo de Infectividade Lambda
 
 ```{r}
 hj <- as.Date("2020-03-30")
-incid_p <- incidence(dates = datas, last_date = hj)
+#incid_p <- incidence(dates = datas, last_date = hj)
+incid_p <- incidence(dates = datas)
 
 # os valores de média e desvio padrão são dados no post, 
 # são derivados 
@@ -179,9 +180,9 @@ R
 
 ```{r}
 # pacote earlyR
-res <- earlyR::get_R(incid_p, si_mean = 5, si_sd = 3.4)
-res
-plot(res)
+#res <- earlyR::get_R(incid_p, si_mean = 5, si_sd = 3.4)
+#res
+#plot(res)
 ```
 
 

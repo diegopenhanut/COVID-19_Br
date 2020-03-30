@@ -1,5 +1,6 @@
 #!/usr/bin/env Rscript
 
+
 # Carregar pacotes
 library("tidyverse")
 library('lubridate')
@@ -23,6 +24,7 @@ for (i in 1:length(file_list)) {
 
   print("Leitura terminada")
   }
+
 
 casos <- bind_rows(files)
 
@@ -55,9 +57,15 @@ head(casos$dia)
 
 casos <- casos %>% mutate(nome = toupper(str_trim(nome)))
 casos <- casos %>% mutate(confirmados = Casos.confirmados)
-
 casos <- casos %>% select(dia, sigla, nome, confirmados, obitos = Óbitos)
 
-write_csv2(casos, 'output/casos_compilados.csv')
+
+from_mar <- read.delim2("dados/from_mar_29/brasil.csv") %>%
+	mutate(dia = ymd(dia))
+
+compilado <- bind_rows(casos, from_mar) %>%
+	arrange(dia, nome)
+
+write_csv2(compilado, 'output/casos_compilados.csv')
 
 
