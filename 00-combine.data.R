@@ -9,7 +9,9 @@ library('lubridate')
 
 # maiores info sobre origem dos dados, procurar em `dados/readme`
 
-file_list <- list.files(path = "dados/before_mar_28/", pattern = "*.csv", full.names = TRUE)
+file_list <- list.files(path = "dados/before_mar_28/", 
+						pattern = "*.csv",
+						full.names = TRUE)
 #rm(files)
 files <- vector(mode = "list", length = length(file_list))
 
@@ -63,7 +65,9 @@ casos <- casos %>% select(dia, sigla, nome, confirmados, obitos = Óbitos)
 from_mar <- read.delim2("dados/from_mar_29/brasil.csv") %>%
 	mutate(dia = ymd(dia))
 
-compilado <- bind_rows(casos, from_mar) %>%
+from_mar2 <- read_csv2("dados/from_mar_29/2020-03-30.csv") 
+
+compilado <- bind_rows(casos, from_mar, from_mar2) %>%
 	arrange(dia, nome)
 
 write_csv2(compilado, 'output/casos_compilados.csv')
