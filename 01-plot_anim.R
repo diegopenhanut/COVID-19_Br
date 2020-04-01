@@ -1,6 +1,5 @@
 #!/usr/bin/env Rscript
 
-
 # Carregar pacotes
 
 library("brazilmaps")
@@ -165,6 +164,5 @@ anim_save(filename = "animações/brasil_mapa.gif")
 
 # vid_map <- animate(anim_mapa, renderer = av_renderer()) 
 # anim_save("animações/brasil_mapa.mp4", vid_map)
-
 
 

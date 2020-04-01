@@ -66,10 +66,10 @@ from_mar <- read.delim2("dados/from_mar_29/brasil.csv") %>%
 	mutate(dia = ymd(dia))
 
 from_mar2 <- read_csv2("dados/from_mar_29/2020-03-30.csv") 
+from_mar3 <- read_csv2("dados/from_mar_29/2020-03-31.csv") 
 
-compilado <- bind_rows(casos, from_mar, from_mar2) %>%
+compilado <- bind_rows(casos, from_mar, from_mar2, from_mar3) %>%
 	arrange(dia, nome)
 
 write_csv2(compilado, 'output/casos_compilados.csv')
-
 
