@@ -28,27 +28,32 @@ https://rviews.rstudio.com/2020/03/05/covid-19-epidemiology-with-r/
 
 ```{r}
 library("tidyverse")
+library("lubridate")
 library("earlyR")
 library("EpiEstim")
 theme_set(theme_minimal())
 
-casos <- read_csv2("output/casos_compilados.csv")
+covid <- read_csv2("dados/COVID19_20200401.csv") %>%
+	rename(dia = data) %>%
+	mutate(dia = dmy(dia)) %>%
+	filter(dia >= ymd("2020-02-26"))
 
-bra <- casos %>%
+bra <- covid %>%
   group_by(dia) %>%
-  summarise(confirmados = sum(confirmados, na.rm = TRUE),
-            óbitos = sum(obitos, na.rm = TRUE)) 
+  summarise(confirmados = sum(casosAcumulados, na.rm = TRUE),
+            óbitos = sum(obitosAcumulado, na.rm = TRUE)) 
 
+bra
 # bra <- mutate(bra, casos = if_else(casos == 0, as.numeric(NA), casos)) 
 ```
 
 # Variáveis que serão usadas depois
 ```{r}
-hoje <- format(Sys.time(), "%A, %d de %B de %Y")
+hoje <- Sys.Date()
 
-ultimo_dia <- max(casos$dia)
+ultimo_dia <- max(covid$dia)
 
-primeiro_dia <- min(casos$dia)
+primeiro_dia <- min(covid$dia)
 
 ```
 
@@ -151,7 +156,7 @@ ggsave('plots/incidência_linha.png', device = 'png')
 Criação do objeto do tipo incidência e cálculo de Infectividade Lambda
 
 ```{r}
-hj <- as.Date("2020-03-30")
+#hj <- as.Date("2020-03-30")
 #incid_p <- incidence(dates = datas, last_date = hj)
 incid_p <- incidence(dates = datas)
 
