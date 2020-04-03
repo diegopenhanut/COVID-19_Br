@@ -33,7 +33,7 @@ library("earlyR")
 library("EpiEstim")
 theme_set(theme_minimal())
 
-covid <- read_csv2("dados/COVID19_20200401.csv") %>%
+covid <- read_csv2("dados/COVID19.csv") %>%
 	rename(dia = data) %>%
 	mutate(dia = dmy(dia)) %>%
 	filter(dia >= ymd("2020-02-26"))
@@ -41,7 +41,7 @@ covid <- read_csv2("dados/COVID19_20200401.csv") %>%
 bra <- covid %>%
   group_by(dia) %>%
   summarise(confirmados = sum(casosAcumulados, na.rm = TRUE),
-            óbitos = sum(obitosAcumulado, na.rm = TRUE)) 
+            óbitos = sum(obitosAcumulados, na.rm = TRUE)) 
 
 bra
 # bra <- mutate(bra, casos = if_else(casos == 0, as.numeric(NA), casos)) 

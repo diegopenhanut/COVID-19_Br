@@ -15,7 +15,7 @@ library("magick")
 
 # casos <- read_csv2("output/casos_compilados.csv")
 
-covid <- read_csv2("dados/COVID19_20200401.csv") %>%
+covid <- read_csv2("dados/COVID19.csv") %>%
 	mutate(data = dmy(data)) %>%
 	filter(data >= ymd("2020-02-26"))
 
@@ -50,7 +50,7 @@ primeiro_dia <- ymd("2020-02-26")
 brasil <- covid %>%
   group_by(data) %>%
   summarise(confirmados = sum(casosAcumulados, na.rm = TRUE),
-            obitos = sum(obitosAcumulado, na.rm = TRUE)) %>%
+            obitos = sum(obitosAcumulados, na.rm = TRUE)) %>%
   gather(key = tipo, value = casos, -data) %>%
   mutate(tipo = factor(x = tipo, levels = c("obitos", "confirmados")))
 
@@ -96,9 +96,9 @@ ggsave(filename = "plots/brasil_predicao.png", predicao_brasil, device = "png")
 
 estados <- covid %>%
 	filter(data == ultimo_dia) %>%
-  select(estado, casosAcumulados, obitosAcumulado) %>%
+  select(estado, casosAcumulados, obitosAcumulados) %>%
   gather(key = 'tipo', value = 'casos', -estado) %>%
-  mutate(tipo = factor(x = tipo, levels = c("obitosAcumulado", "casosAcumulados")))
+  mutate(tipo = factor(x = tipo, levels = c("obitosAcumulados", "casosAcumulados")))
 
 
 # sem animação, estados
@@ -132,9 +132,9 @@ anim_save(filename = "animações/brasil_linear.gif")
 
 
 estados_anim <- covid %>%
-  select(estado, casosAcumulados, obitosAcumulado, data) %>%
+  select(estado, casosAcumulados, obitosAcumulados, data) %>%
   gather(key = 'tipo', value = 'casos', -estado, -data) %>%
-  mutate(tipo = factor(x = tipo, levels = c("obitosAcumulado", "casosAcumulados")))
+  mutate(tipo = factor(x = tipo, levels = c("obitosAcumulados", "casosAcumulados")))
 
 
 anim_estado_bar <- ggplot(estados_anim, aes(x = estado, y = casos, fill = tipo)) +
