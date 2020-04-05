@@ -37,10 +37,6 @@ ce <- left_join(backbone, ce)
 ultimo_dia <- ce %>% 
 	filter(dia == max(dia))
 
-lele <- plot_brmap(ce_map, data_to_join = ultimo_dia, 
-             join_by = c("nome" = "municipio"),
-             var = "confirmado") +
-scale_fill_viridis_c(na.value = 0, trans = 'log10', guide = "legend") 
 
 ce_map <- left_join(ce_map, ce, by = c('nome' = 'municipio'))
 
@@ -90,5 +86,7 @@ sus <- ggplot(ce_map) +
 	xlab("") +
 	transition_time(dia) +
 	scale_fill_viridis_c(na.value = 0, trans = 'log10', guide = "legend") 
+
+sus
 
 anim_save(filename = "animações/ce_suspeitos_mapa.gif")
