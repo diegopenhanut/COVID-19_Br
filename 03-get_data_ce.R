@@ -1,4 +1,4 @@
-#!/usr/bin/env RScript
+#!/usr/bin/env Rscript
 
 # get data from convid, Ceara State
 
@@ -7,9 +7,9 @@ library(lubridate)
 library(rjson)
 
 get_ce_data <- function(tipo, 
-						   first_day = ymd("2020-03-14"), 
-						   last_day = Sys.Date(), 
-						   wait = 2){
+						first_day = ymd("2020-03-14"), 
+						last_day = Sys.Date(), 
+						wait = 2){
 	out <- list()
 	d <- seq(first_day, last_day, 1)
 
@@ -21,7 +21,7 @@ get_ce_data <- function(tipo,
 	for(i in as.list(d)){
 		print(paste0("getting ", tipo, " data from ", i))
 
-		query <- URLencode(paste0(f_query, i, l_query))
+		query <- URLencode(paste0(base_query, i, l_query))
 
 		json_data <- fromJSON(file = query) %>%
 			bind_rows() %>%
@@ -44,7 +44,8 @@ confirmado <- confirmado %>% rename(confirmado = quantidade) %>%
 	select(-tipo) 
 
 
-suspeito <- get_ce_data("Suspeito")
+suspeito <- get_ce_data("Suspeito", wait = 3)
+
 suspeito <- suspeito %>% rename(suspeito = quantidade) %>%
 	select(-tipo) 
 
@@ -52,4 +53,26 @@ out <- left_join(confirmado, suspeito)
 
 out <- left_join(out, obito, by = c("idMunicipio", "municipio", "dia"))
 
-write_csv2(x = out, path = "output/ce.csv")
+write_csv2(x = out, path = "output/ce_municipio.csv")
+
+
+out_sum <- out %>% 
+	select(-idMunicipio, -municipio) %>%
+	group_by(dia) %>%
+	summarize(
+			  suspeito = sum(suspeito, na.rm = TRUE),
+			  confirmado = sum(suspeito, na.rm = TRUE),
+			  obito = sum(suspeito, na.rm = TRUE),
+			  )
+
+write_csv2(x = out_sum, path = "output/ce.csv")
+
+
+incidencia <- fromJSON(file = 
+					   "https://indicadores.integrasus.saude.ce.gov.br/api/coronavirus/qtd-por-dia-tipo?tipo=Confirmado"	   
+				   ) %>%
+bind_rows() %>%
+select(-tipo) %>% 
+rename(dia = data)
+
+write_csv2(x = incidencia, path = "output/ce_novos_casos.csv")
