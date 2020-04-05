@@ -6,6 +6,9 @@ coletar os dados do ministério da saúde a partir de 14 de março. Para consegu
 os dados anteriores, procurei em grandes portais de notícia. Detalhes sobre
 isso podem ser encontrados na pasta `dados/`
 
+Depois de algumas semanas, o Ministério da Saúde passou a disponilizar os
+mesmos dados em um arquivo csv. Esses são os dados que estão sendo usados agora
+
 Uma parte dos gráficos foi feita com animações, de modo que possa ter maior
 impacto, mostrando as pessoas o quão rápido o número de casos vêm aumentando.
 
@@ -18,6 +21,8 @@ impacto, mostrando as pessoas o quão rápido o número de casos vêm aumentando
 `sudo apt install libgdal-dev libmagick++-dev` 
 - libsodium
 `sudo apt install libsodium-dev`
+
+
 ## Gráficos sem animação
 
 ![](plots/brasil_linear.png)
@@ -36,9 +41,24 @@ impacto, mostrando as pessoas o quão rápido o número de casos vêm aumentando
 ![](animações/estados_barras.gif)
 
 
-### Número de casos por estado e tempo, escala de cor
+### Número de casos por estado e tempo
 ![](animações/brasil_mapa.gif)
 
+## Ceará
+
+### Número de casos suspeitos por município e tempo
+
+![](animações/ce_suspeitos_mapa.gif)
+
+### Número de casos confirmados por município e tempo
+
+![](animações/ce_confirmados_mapa.gif)
+
+### Número de óbitos por município e tempo
+
+![](animações/ce_obitos_mapa.gif)
+
+
 ## Observações
-- Vou tentar manter atualizado, tão logo o Ministério da Saúde continue
-  liberando as tabelas com número de casos
+- Dados de Brasil provêm do Ministério da Saúde
+- Dados do Ceará são de origem da Secretaria de Saúde do Estado do Ceará
