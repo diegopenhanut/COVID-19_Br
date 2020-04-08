@@ -7,7 +7,6 @@ library("tidyverse")
 library('lubridate')
 library("gganimate")
 library("magick")
-:x
 
 
 
@@ -15,12 +14,12 @@ library("magick")
 
 # casos <- read_csv2("output/casos_compilados.csv")
 
-covid <- read_csv2("dados/COVID19.csv") %>%
-	mutate(data = dmy(data)) %>%
-	filter(data >= ymd("2020-02-26"))
+covid <- read_csv2("dados/COVID19.csv",
+				   local = locale(encoding = "latin1")) %>%
+mutate(data = dmy(date)) 
 
 mapa_sigla <-
-	structure(list(estado = c("AC", "AL", "AP", "AM", "BA", "CE",             
+	structure(list(sigla = c("AC", "AL", "AP", "AM", "BA", "CE",             
 							 "DF", "ES", "GO", "MA", "MT", "MS", "MG", "PA", "PB", "PR", "PE",        
 							 "PI", "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO"),             
 				   nome = c("ACRE", "ALAGOAS", "AMAPÁ", "AMAZONAS", "BAHIA",            
@@ -96,16 +95,16 @@ ggsave(filename = "plots/brasil_predicao.png", predicao_brasil, device = "png")
 
 estados <- covid %>%
 	filter(data == ultimo_dia) %>%
-  select(estado, casosAcumulados, obitosAcumulados) %>%
-  gather(key = 'tipo', value = 'casos', -estado) %>%
+  select(sigla, casosAcumulados, obitosAcumulados) %>%
+  gather(key = 'tipo', value = 'casos', -sigla) %>%
   mutate(tipo = factor(x = tipo, levels = c("obitosAcumulados", "casosAcumulados")))
 
 
 # sem animação, estados
 
-simples_estados <- ggplot(estados, aes(x = estado, y = casos, fill = tipo)) +
+simples_estados <- ggplot(estados, aes(x = sigla, y = casos, fill = tipo)) +
   geom_col(position = 'dodge') +
-  ggtitle(paste0("Casos confirmados por estado em ", ultimo_dia, " COVID-19")) + 
+  ggtitle(paste0("Casos confirmados por sigla em ", ultimo_dia, " COVID-19")) + 
   xlab("Estados") + 
   ylab("Confirmados") + 
   theme_minimal() +
@@ -132,12 +131,12 @@ anim_save(filename = "animações/brasil_linear.gif")
 
 
 estados_anim <- covid %>%
-  select(estado, casosAcumulados, obitosAcumulados, data) %>%
-  gather(key = 'tipo', value = 'casos', -estado, -data) %>%
+  select(sigla, casosAcumulados, obitosAcumulados, data) %>%
+  gather(key = 'tipo', value = 'casos', -sigla, -data) %>%
   mutate(tipo = factor(x = tipo, levels = c("obitosAcumulados", "casosAcumulados")))
 
 
-anim_estado_bar <- ggplot(estados_anim, aes(x = estado, y = casos, fill = tipo)) +
+anim_estado_bar <- ggplot(estados_anim, aes(x = sigla, y = casos, fill = tipo)) +
   geom_col(position = 'dodge') +
   transition_time(data) +
   labs(title = 'Casos confirmados no Brasil - COVID-19',

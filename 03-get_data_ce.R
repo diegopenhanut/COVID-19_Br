@@ -33,18 +33,18 @@ get_ce_data <- function(tipo,
 	bind_rows(out) 
 }
 
-obito <- get_ce_data("Óbito")
+obito <- get_ce_data("Óbito", wait = 1)
 obito <- obito %>% 
 	rename(obito = quantidade) %>%
 	select(-tipo) 
 
 
-confirmado <- get_ce_data("Confirmado")
+confirmado <- get_ce_data("Confirmado", wait = 1)
 confirmado <- confirmado %>% rename(confirmado = quantidade) %>%
 	select(-tipo) 
 
 
-suspeito <- get_ce_data("Suspeito", wait = 3)
+suspeito <- get_ce_data("Suspeito", wait = 1)
 
 suspeito <- suspeito %>% rename(suspeito = quantidade) %>%
 	select(-tipo) 
@@ -61,8 +61,8 @@ out_sum <- out %>%
 	group_by(dia) %>%
 	summarize(
 			  suspeito = sum(suspeito, na.rm = TRUE),
-			  confirmado = sum(suspeito, na.rm = TRUE),
-			  obito = sum(suspeito, na.rm = TRUE),
+			  confirmado = sum(confirmado, na.rm = TRUE),
+			  obito = sum(obito, na.rm = TRUE),
 			  )
 
 write_csv2(x = out_sum, path = "output/ce.csv")
