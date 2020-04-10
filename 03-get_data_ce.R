@@ -35,18 +35,18 @@ get_ce_data <- function(tipo,
 
 obito <- get_ce_data("Óbito", wait = 1)
 obito <- obito %>% 
-	rename(obito = quantidade) %>%
+	rename(obito = qtdObito) %>%
 	select(-tipo) 
 
 
 confirmado <- get_ce_data("Confirmado", wait = 1)
-confirmado <- confirmado %>% rename(confirmado = quantidade) %>%
+confirmado <- confirmado %>% rename(confirmado = qtdConfirmado) %>%
 	select(-tipo) 
 
 
 suspeito <- get_ce_data("Suspeito", wait = 1)
 
-suspeito <- suspeito %>% rename(suspeito = quantidade) %>%
+suspeito <- suspeito %>% rename(suspeito = qtdSuspeito) %>%
 	select(-tipo) 
 
 out <- left_join(confirmado, suspeito)
