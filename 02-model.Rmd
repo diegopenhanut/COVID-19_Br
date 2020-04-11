@@ -35,9 +35,11 @@ theme_set(theme_minimal())
 
 covid <- read_csv2("dados/COVID19.csv", local = locale(encoding = "latin1")) %>%
 	rename(estado = sigla) %>%
-	rename(dia = data) %>%
+	rename(dia = date) %>%
 	mutate(dia = dmy(dia)) %>%
-	filter(dia >= ymd("2020-02-26"))
+	filter(dia >= ymd("2020-02-26")) %>%
+	mutate(casosAcumulados = cases) %>%
+	mutate(obitosAcumulados = deaths)
 
 bra <- covid %>%
   group_by(dia) %>%

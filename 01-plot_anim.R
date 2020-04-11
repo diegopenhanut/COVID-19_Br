@@ -16,7 +16,9 @@ library("magick")
 
 covid <- read_csv2("dados/COVID19.csv",
 				   local = locale(encoding = "latin1")) %>%
-mutate(data = dmy(data)) 
+mutate(data = dmy(date)) %>%
+mutate(casosAcumulados = cases) %>%
+mutate(obitosAcumulados = deaths)
 
 mapa_sigla <-
 	structure(list(sigla = c("AC", "AL", "AP", "AM", "BA", "CE",             
