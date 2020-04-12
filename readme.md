@@ -44,6 +44,10 @@ impacto, mostrando as pessoas o quão rápido o número de casos vêm aumentando
 ### Número de casos por estado e tempo
 ![](animações/brasil_mapa.gif)
 
+### Força de infecção, Lambra, Brasil
+
+![](plots/incidência_lambda.png)
+
 ## Ceará
 
 ### Número de casos suspeitos por município e tempo
