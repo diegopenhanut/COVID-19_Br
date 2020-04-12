@@ -34,12 +34,12 @@ library("EpiEstim")
 theme_set(theme_minimal())
 
 covid <- read_csv2("dados/COVID19.csv", local = locale(encoding = "latin1")) %>%
-	rename(estado = sigla) %>%
-	rename(dia = date) %>%
+#	rename(estado = sigla) %>%
+	rename(dia = data) %>%
 	mutate(dia = dmy(dia)) %>%
-	filter(dia >= ymd("2020-02-26")) %>%
-	mutate(casosAcumulados = cases) %>%
-	mutate(obitosAcumulados = deaths)
+	filter(dia >= ymd("2020-02-26"))
+#	mutate(casosAcumulados = cases) %>%
+#	mutate(obitosAcumulados = deaths) %>%
 
 bra <- covid %>%
   group_by(dia) %>%
