@@ -16,7 +16,7 @@ library("magick")
 
 covid <- read_csv2("dados/COVID19.csv",
 				   local = locale(encoding = "latin1")) %>%
-mutate(data = dmy(data)) %>%
+#mutate(data = dmy(data)) %>%
 mutate(sigla = estado)
 
 mapa_sigla <-
@@ -43,6 +43,8 @@ hoje <- Sys.Date()
 ultimo_dia <- max(covid$data)
 
 primeiro_dia <- ymd("2020-02-26")
+
+covid <- filter(covid, data >= primeiro_dia)
 
 
 # gráfico de linha
