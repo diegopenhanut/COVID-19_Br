@@ -40,13 +40,15 @@ obito <- obito %>%
 
 
 confirmado <- get_ce_data("Confirmado", wait = 1)
-confirmado <- confirmado %>% rename(confirmado = qtdConfirmado) %>%
+confirmado <- confirmado %>% 
+	rename(confirmado = qtdConfirmado) %>%
 	select(-tipo) 
 
 
-suspeito <- get_ce_data("Suspeito", wait = 1)
+suspeito <- get_ce_data("Em investigação", wait = 1)
 
-suspeito <- suspeito %>% rename(suspeito = qtdSuspeito) %>%
+suspeito <- suspeito %>%
+	rename(suspeito = qtdSuspeito) %>%
 	select(-tipo) 
 
 out <- left_join(confirmado, suspeito)
