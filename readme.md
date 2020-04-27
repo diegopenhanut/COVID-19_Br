@@ -21,6 +21,12 @@ impacto, mostrando as pessoas o quão rápido o número de casos vêm aumentando
 `sudo apt install libgdal-dev libmagick++-dev` 
 - libsodium
 `sudo apt install libsodium-dev`
+- libproj
+`sudo apt install libproj-dev`
+- libgfortran
+`sudo apt install libgfortran4`
+- pacote sf
+`install.package('sf')`
 
 
 ## Gráficos sem animação
