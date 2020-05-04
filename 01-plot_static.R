@@ -5,11 +5,11 @@
 library("brazilmaps")
 library("tidyverse")
 library('lubridate')
-library("gganimate")
-library("magick")
+#library("gganimate")
+#library("magick")
+library('sf')
 
-
-
+# Depois é melhor separar a parte com a o cleaning em outro arquivo
 # Lendo arquivos com casos
 
 # casos <- read_csv2("output/casos_compilados.csv")
@@ -44,8 +44,11 @@ ultimo_dia <- max(covid$data)
 
 primeiro_dia <- ymd("2020-02-26")
 
-covid <- filter(covid, data >= primeiro_dia)
+# total de dias de registro
+ultimo_dia - primeiro_dia  
 
+
+covid <- filter(covid, data >= primeiro_dia)
 
 # gráfico de linha
 
@@ -76,25 +79,40 @@ simples_brasil
 ggsave(filename = "plots/brasil_linear.png", simples_brasil, device = "png")
 
 
-# tentando extrapolar usando log para uma semana de casos
+# tentando extrapolar usando log para uma semana de casos, usando dados do último mês
 
-predicao_brasil <- filter(brasil, tipo == "confirmados") %>%
-  ggplot(aes(x = data, y = casos, color = tipo)) +
-  scale_y_continuous(trans='log10') + 
-  geom_point() +
-  xlim(primeiro_dia, ultimo_dia + 7) +
-  stat_smooth(method="lm", 
-              #formula = 'x ~ log(y)',
-              fullrange=TRUE) + 
-  labs(title = 'Predição do número casos para os próximos 7 dias - COVID-19',
-       subtitle = paste0('último dia: ', ultimo_dia, ', predição até: ', ultimo_dia + 7) ) +
-  theme_minimal()
+dias_passados <- ultimo_dia - 15
+dias_futuros <- ultimo_dia + 7
+
+predicao_brasil <- brasil %>%
+	ggplot(aes(x = data, y = casos, color = tipo)) +
+	scale_y_continuous(trans='log10') + 
+	geom_point() +
+	xlim(primeiro_dia, dias_futuros) +
+	facet_wrap(~ tipo, scales = 'free') 
+#	geom_vline(xintercept = dias_passados) 
+
+predicao_brasil <- predicao_brasil + 
+	geom_smooth(data = filter(brasil, data > dias_passados),
+				aes(x = data, y = casos),
+				fullrange=T,
+				method = "glm", formula = y~x,
+				method.args = list(family = gaussian(link = 'log'))) +
+  ylim(0, NA) + 
+	  labs(title = paste0('Predição do número casos para os próximos ',
+						  7, 
+						  ' dias 
+						  utilizando dados dos últimos ',
+						  15 ,
+						  ' dias - COVID-19'),
+		   subtitle = paste0('último dia: ', ultimo_dia, ', predição até: ', dias_futuros) ) +
+theme_minimal() 
   
 predicao_brasil
 
 ggsave(filename = "plots/brasil_predicao.png", predicao_brasil, device = "png")
 
-# gráfico de barras, com último dia
+# gráfico de barras, do último dia
 
 estados <- covid %>%
 	filter(data == ultimo_dia) %>%
@@ -117,78 +135,6 @@ simples_estados
 
 ggsave(filename = "plots/estados_barra.png", simples_estados, device = "png")
 
-# com animação, brasil
 
-ani_brasil <- ggplot(brasil, aes(x = data, y = casos, color = tipo)) +
-  geom_line() +
-  geom_point(size = 2) + 
-  transition_reveal(data) +
-  labs(title = 'Casos confirmados no Brasil - COVID-19') +
-  theme_minimal() +
-  xlab("Dia") + 
-  ylab("Confirmados") 
-
-ani_brasil
-
-anim_save(filename = "animações/brasil_linear.gif")
-
-
-estados_anim <- covid %>%
-  select(sigla, casosAcumulados, obitosAcumulados, data) %>%
-  gather(key = 'tipo', value = 'casos', -sigla, -data) %>%
-  mutate(tipo = factor(x = tipo, levels = c("obitosAcumulados", "casosAcumulados")))
-
-
-anim_estado_bar <- ggplot(estados_anim, aes(x = sigla, y = casos, fill = tipo)) +
-  geom_col(position = 'dodge') +
-  transition_time(data) +
-  labs(title = 'Casos confirmados no Brasil - COVID-19',
-     subtitle = 'dia {frame_time}') +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
-
-anim_estado_bar
-
-anim_save(filename = "animações/estados_barras.gif")
-
-# preparando mapa
-
-br <- get_brmap(geo = "State",
-          geo.filter = NULL,
-          class = "sf")
-
-anim_mapa <- 
-  plot_brmap(br, data_to_join = covid, 
-             join_by = c("nome" = "nome"),
-             var = "casosAcumulados") + 
-  coord_sf(datum = NA) +
-  labs(title = "Brasil - COVID-19", 
-       subtitle = paste0(
-         ' casos confirmados em ',
-         "{frame_time}"
-       )) +
-  ylab("") +
-  xlab("") +
-  transition_time(data) +
-  scale_fill_viridis_c(na.value = 0, trans = 'log10', guide = "legend") +
-  theme_minimal()
-
-anim_mapa
-
-anim_save(filename = "animações/brasil_mapa.gif")
-
-
-# Caso o output pretendido seja vídeo
-
-# library("av")
-
-# vid_temp <- animate(ani_brasil, renderer = av_renderer()) 
-# anim_save("animações/brasil_linear.mp4", vid_temp)
-
-# vid_estado_bar <- animate(anim_estado_bar, renderer = av_renderer()) 
-# anim_save("animações/estados_barras.mp4", vid_estado_bar)
-
-# vid_map <- animate(anim_mapa, renderer = av_renderer()) 
-# anim_save("animações/brasil_mapa.mp4", vid_map)
 
 
