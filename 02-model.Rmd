@@ -64,7 +64,7 @@ primeiro_dia <- min(covid$dia)
 
 ```{r}
 # modelando
-me <- with(bra, lm(log(confirmados) ~ dia))
+me <- with(filter(bra, dia > ultimo_dia - 15), lm(log(confirmados) ~ dia))
 summary(me)
 
 periodo_pred <- seq(primeiro_dia, ultimo_dia + 7, 1)
@@ -72,6 +72,8 @@ predicao <- exp(predict(me,list(dia=periodo_pred)))
 pre <- tibble(dia = periodo_pred, pred = predicao)
 
 bra_pred <- left_join(pre, bra, by = "dia")
+
+tail(bra_pred, 15)
 
 
 # gráfico em barras
