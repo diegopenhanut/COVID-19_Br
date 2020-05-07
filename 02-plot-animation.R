@@ -1,4 +1,6 @@
 #!/usr/bin/env RScript
+start_time <- Sys.time()
+print(paste0('começando: ', start_time))
 
 library("brazilmaps")
 library("tidyverse")
@@ -6,7 +8,7 @@ library('lubridate')
 library("gganimate")
 library("magick")
 library('sf')
-
+# install.package('transformr')
 
 # Lendo arquivos com casos
 
@@ -105,20 +107,23 @@ br <- get_brmap(geo = "State",
           geo.filter = NULL,
           class = "sf")
 
-selected_days <- 
-	covid %>% filter(data %in% seq(primeiro_dia, ultimo_dia, length.out=4))
+# ggplot(br) +
+# 	geom_sf()
 
-selected_days <- 
-	covid %>% filter(data == ultimo_dia)
+#selected_days <- 
+#	covid %>% filter(data %in% seq(primeiro_dia, ultimo_dia, length.out=4))
+
+#selected_days <- 
+#	covid %>% filter(data == ultimo_dia)
 
 # https://github.com/tidyverse/ggplot2/issues/2799
 # cf <- coord_fixed()
 # cf$default <- TRUE
 
-# lala <- left_join(br, selected_days, by = c('nome' = 'nome'))  
+lala <- left_join(br, covid, by = c('nome' = 'nome'))  
 # 
-anim_mapa <- ggplot(selected_days, aes(fill = casosAcumulados)) +
- 	geom_sf()+
+anim_mapa <- ggplot(lala, aes(fill = casosAcumulados)) +
+ 	geom_sf() +
  	coord_sf(datum = NA) +
  	labs(title = "Brasil - COVID-19", 
  		 subtitle = paste0(
@@ -127,11 +132,35 @@ anim_mapa <- ggplot(selected_days, aes(fill = casosAcumulados)) +
  						   )) +
  ylab("") +
  xlab("") +
- transition_time(data) +
- scale_fill_viridis_c(na.value = 0, trans = 'log10', guide = "legend") +
+	transition_time(data) +
+# scale_fill_viridis_c(na.value = 0, trans = 'log10', guide = "legend") +
  theme_minimal()
 
+#anim_mapa
 
+magick::image_write(
+					animate(anim_mapa),
+					"animações/brasil_mapa.gif"
+)
+# animate(plot = anim_mapa, nframes = 50, detail = 2)
+# anim_save(anim_mapa, filename = "animações/brasil_mapa.gif")
+# 
+# anim_mapa <- ggplot(lala, aes(fill = casosAcumulados)) +
+#  	geom_sf()+
+#  	coord_sf(datum = NA) +
+#  	labs(title = "Brasil - COVID-19", 
+#  		 subtitle = paste0(
+#  						   ' casos confirmados em ',
+#  						   "{frame_time}"
+#  						   )) +
+#  ylab("") +
+#  xlab("") +
+# # transition_time(data) +
+#  scale_fill_viridis_c(na.value = 0, trans = 'log10', guide = "legend") +
+#  theme_minimal()
+# 
+# anim_mapa
+# 
 # anim_mapa <- 
 #   plot_brmap(br, data_to_join = selected_days, 
 #              join_by = c("nome" = "nome"),
@@ -148,15 +177,15 @@ anim_mapa <- ggplot(selected_days, aes(fill = casosAcumulados)) +
 #   transition_time(data) +
 #   scale_fill_viridis_c(na.value = 0, trans = 'log10', guide = "legend") +
 #   theme_minimal()
-
-#anim_mapa
-
-magick::image_write(
-					animate(anim_mapa),
-					"animações/brasil_mapa.gif"
-)
-# animate(plot = anim_mapa, nframes = 50, detail = 2)
-# anim_save(filename = "animações/brasil_mapa.gif")
+# 
+# #anim_mapa
+# 
+# magick::image_write(
+# 					animate(anim_mapa),
+# 					"animações/brasil_mapa.gif"
+# )
+# # animate(plot = anim_mapa, nframes = 50, detail = 2)
+# anim_save(anim_mapa, filename = "animações/brasil_mapa.gif")
 
 
 # Caso o output pretendido seja vídeo
@@ -171,5 +200,9 @@ magick::image_write(
 
 # vid_map <- animate(anim_mapa, renderer = av_renderer()) 
 # anim_save("animações/brasil_mapa.mp4", vid_map)
+end_time <- Sys.time()
 
+print(paste0('terminando em: ', end_time))
+
+print(paste0('duração: ', end_time - start_time))
 
