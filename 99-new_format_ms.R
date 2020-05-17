@@ -8,7 +8,7 @@ library(gganimate)
 start_time <- Sys.time()
 print(paste0('começando: ', start_time))
 
-tab <- read_xlsx("~/Downloads/HIST_PAINEL_COVIDBR_20200516.xlsx", 
+tab <- read_xlsx("dados/HIST_PAINEL_COVIDBR_20200516.xlsx", 
 				 col_types = 
 					 c("text", "text", "text", "numeric", "text", "text", 
 					   "text", "guess", "numeric", "numeric", "numeric", 
